@@ -13,7 +13,12 @@ jar:
 	cd src; jar cvf NeighborhoodScoreHadoop.jar *.class
 
 run:
-	cd src; hadoop jar NeighborhoodScoreHadoop.jar KNeighborScores  /kneighbor/input /kneighbor/output $(REPETITIONS) $(K)
+	cd src;number=1 ; while [[ $$number -le $(REPETITIONS) ]] ; do \
+        hadoop jar NeighborhoodScoreHadoop.jar KNeighborScores  /kneighbor/input /kneighbor/output $(K) ; \
+        ((number = number + 1)) ; \
+    done
+
+	
 
 clean:
 	hdfs dfs -rm -r /kneighbor/output &

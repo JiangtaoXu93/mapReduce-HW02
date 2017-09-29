@@ -1,0 +1,66 @@
+---
+title: "Neighborhood Score: MapReduce - Report"
+author: "Jiangtao Xu"
+date: "9/29/2017"
+output: html_document
+---
+
+## Execution Environment:
+
+Java Version: 1.8.0_144
+
+OS version: macOS 10.12.6
+
+Processor Name: Intel Core i7
+
+Processor Speed: 2.8GHZ
+
+Total Number of Cores: 4
+
+Memory: 16GB
+
+## Run Big-corpus Problem
+
+When run big-corpus on Hadoop, the program takes around 6363.3 seconds, which is nearly one hour.
+
+However, when run big-corpus based on A1 program, A1 program have to store the corpus on memory to enable program to count letters and neighbors. It's easily to run out of memory from either sequential or parallel program. In order to compare the performance of Hadoop and other programs, choose data from A1 as input data for both programs.
+
+## For Hadoop Implementation
+
+For hadoop program, I run hadoop 10 times, and collect running time of each iteration.
+
+```{r setup}
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+results <- read.csv("input/books/result.csv",header = FALSE) %>% 
+  rename(times=V1, implementation=V2) %>%
+  mutate(seconds=(as.numeric(times))/1000)
+```
+
+The follwing plot is the running time distribution of Hadoop, Sequential, Thread 16, Threads 2, Threads 4, Threads 8. From this plot, we found that compared to other implementation, Hadoop takes much more time even than sequential implementation, which takes longest time of A1 program. What's more, differences among each running time is huge for Hadoop implementation, which spans from around 250s to 300s This variance is greater than 16 threads implementation, which holds the bigest variance in A1 program.
+
+```{r running time of all}
+runs <- data.frame(results)
+ggplot(runs, aes(x=implementation, y=seconds)) + geom_violin()
+```
+
+Let's take a detailed look at hadoop implementation and sequential implementation:
+```{r running time of hadoop and sequential implementation}
+hadoop <-runs %>% filter(implementation=="Hadoop") %>% mutate(i=1:n())
+sequential <-runs %>% filter(implementation=="Sequential") %>% mutate(i=1:n())
+all <- rbind(sequential,hadoop)
+ggplot(all, aes(x=i, y=seconds, color=implementation)) + geom_point()
+```
+
+From this plot, we can clearly see that the average of hadoop implementated running time is far larger than the running time of sequential implementation. Besides, running time of hadoop is not stable, which ranges nearly from 260s to 290s
+
+## Conclusion
+
+When running MapReduce program on pseudo-distributed cluster, although it's parallel impletation, it runs slower than any concurrent program. Indeed, it even slower than sequential implementation.
+
+The reason may be the framework of hadoop, which needs program reading and writing from HDFS, needs more calculation of schdule resource, needs monitoring, running mappper, reducer functions and etc. Compared to sequential and concurrent implementation, resource usage is much higher, which on the other hand pseudo-distributed requires more resource to run the code.
+
+Since resource competition among pseudo-distributed is higher than other two implementation, so the performance of pseudo-distributed cluster is much easily influenced by other running program, which result in the huge variance of running time. For example, once I closed Chrome brower, the MapReduce process became quicker after release the memory of running Chrome. 
+
+
+

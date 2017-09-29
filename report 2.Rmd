@@ -1,0 +1,52 @@
+---
+title: "A0 report"
+author: "Yang Xia"
+date: "September 22, 2017"
+output: html_document
+---
+
+## Loading benchmark results
+
+```{r setup}
+suppressMessages(library(dplyr))
+suppressMessages(library(ggplot2))
+results <- read.csv("results.csv", header = FALSE) %>% 
+  rename(stage=V1, implementation=V2, k=V3, nano.time=V4) %>% 
+  filter(k == 8) %>% 
+  mutate(seconds=nano.time/1.e09) %>% 
+  collect
+```
+
+## Total execution time
+
+``` {r exec-time}
+totals <- results %>% filter(stage == "total")  %>% select(implementation, seconds)
+ggplot(totals, aes(x=implementation, y=seconds)) + geom_violin()
+```
+
+## Processing without I/O
+
+``` {r exec-time-just-runs}
+runs <- results %>% filter(stage == "run")  %>% select(implementation, seconds)
+ggplot(runs, aes(x=implementation, y=seconds)) + geom_violin()
+```
+
+## Scatter
+
+``` {r scatter}
+sequential <-runs %>% filter(implementation=="sequential") %>% mutate(i=1:n())
+pool16 <-runs %>% filter(implementation=="pool16") %>% mutate(i=1:n())
+pool2 <-runs %>% filter(implementation=="pool2") %>% mutate(i=1:n())
+all <- rbind(sequential,pool16,pool2)
+ggplot(all, aes(x=i, y=seconds, color=implementation)) + geom_point()
+```
+
+## Only I/O
+
+``` {r exec-time-just-io}
+loads <- results %>% filter(stage == "load" ) %>% select(implementation, seconds) %>% mutate(i=1:n())
+stores <- results %>% filter(stage == "store" ) %>% select(implementation, seconds) %>% mutate(i=1:n())
+all <- loads %>% left_join(stores, by=c("i", "implementation")) %>% mutate(seconds=seconds.x+seconds.y)
+#ggplot(all, aes(x=implementation, y=seconds)) + geom_violin()
+ggplot(all, aes(x=i, y=seconds, color=implementation)) + geom_point() #+ geom_boxplot()
+```

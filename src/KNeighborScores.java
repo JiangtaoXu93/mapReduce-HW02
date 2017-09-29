@@ -22,33 +22,32 @@ public class KNeighborScores {
 	private static final Logger logger = Logger.getLogger("io.saagie.example.hdfs.Main");//to print in hadoop
 	private static String INPUT_PATH;
 	private static String OUTPUT_PATH;
-	private static int REPETITIONS;
 	private static String K_NEIGHBORS;
 
 	public static void main(String[] args) throws Exception {
+		long d1 = System.nanoTime();
 
-		if (args.length != 4) {
-			INPUT_PATH = "/kneighbor/randomBooks";
+		if (args.length != 3) {
+			INPUT_PATH = "/kneighbor/input";
 			OUTPUT_PATH = "/kneighbor/output";
-			REPETITIONS = 1;
 			K_NEIGHBORS = "2";
 		}else {
 			INPUT_PATH = args[0];
 			OUTPUT_PATH = args[1];
-			REPETITIONS = Integer.parseInt(args[2]);
-			K_NEIGHBORS = args[3];
+			K_NEIGHBORS = args[2];
 		}
 
-		for (int i = 0 ; i < REPETITIONS; i++) {//run program REPETITIONS times
-			runApplication();
-		}
+			runApplication();//run program
+		
+		long d2 = System.nanoTime();
+		System.out.println((d2 - d1) / 1000000);
 
 	}
 
 
 	public static void runApplication() throws Exception{
 		logger.info("1st round mapreduce to get number of letters");
-
+		long d1 = System.nanoTime();
 		@SuppressWarnings("deprecation")
 		Job job1 = new Job(); 
 		job1.setJarByClass(KNeighborScores.class); 
@@ -119,7 +118,12 @@ public class KNeighborScores {
 				job2.setReducerClass(KNeighborCalculateReducer.class);
 				job2.setOutputKeyClass(Text.class);
 				job2.setOutputValueClass(IntWritable.class);
-				System.exit(job2.waitForCompletion(true) ? 0 : 1);
+				if (job2.waitForCompletion(true)){
+					long d2 = System.nanoTime();
+					logger.info(String.valueOf((d2 - d1) / 1000000));
+					System.exit(0);
+				}
+				
 
 			}else {
 			System.exit(1);
