@@ -1,6 +1,8 @@
 #How to run 
 
-1) Before running, put your untar big-corpus
+1) Before running, put your untar big-corpus/randomBooks into input/big-corpus
+2) run "make setup" to put the local file on hdfs
+3) run "make" to start project 
 
 
 

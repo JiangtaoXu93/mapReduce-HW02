@@ -21,6 +21,6 @@ clean:
 setup:
 	hdfs dfs -mkdir /kneighbor
 	hdfs dfs -mkdir /kneighbor/input
-	hdfs -put input/big-corpus/randomBooks/ /kneighbor/randomBooks
+	hdfs -put input/big-corpus/ /kneighbor
 
 
