@@ -2,7 +2,7 @@ REPETITIONS = 1
 K = 2
 MY_CLASSPATH = $(HADOOP_HOME)/share/hadoop/common/hadoop-common-2.8.1.jar:$(HADOOP_HOME)/share/hadoop/mapreduce/hadoop-mapreduce-client-common-2.8.1.jar:$(HADOOP_HOME)/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.8.1.jar:out.
 
-all: clean build run
+all: clean build run report
 
 build: compile jar
 
@@ -18,7 +18,8 @@ run:
         ((number = number + 1)) ; \
     done
 
-	
+report:
+	Rscript -e "rmarkdown::render('report.rmd')"	
 
 clean:
 	hdfs dfs -rm -r /kneighbor/output &
