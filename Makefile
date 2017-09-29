@@ -13,7 +13,7 @@ jar:
 	cd src; jar cvf NeighborhoodScoreHadoop.jar *.class
 
 run:
-	cd src; hadoop jar NeighborhoodScoreHadoop.jar KNeighborScores  /kneighbor/randomBooks /kneighbor/output $(REPETITIONS) $(K)
+	cd src; hadoop jar NeighborhoodScoreHadoop.jar KNeighborScores  /kneighbor/input /kneighbor/output $(REPETITIONS) $(K)
 
 clean:
 	hdfs dfs -rm -r /kneighbor/output &
@@ -21,6 +21,8 @@ clean:
 setup:
 	hdfs dfs -mkdir /kneighbor
 	hdfs dfs -mkdir /kneighbor/input
-	hdfs -put input/big-corpus/ /kneighbor
+	hdfs dfs -put input/big-corpus/* /kneighbor/input
+teardown:
+	hdfs dfs -rm -r /kneighbor
 
 

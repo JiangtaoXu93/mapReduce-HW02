@@ -1,8 +1,9 @@
 #How to run 
 
-1) Before running, put your untar big-corpus/randomBooks into input/big-corpus
-2) run "make setup" to put the local file on hdfs
+1) Before first running, put your untar file like "0.utf-8" into input/big-corpus
+2) run "make setup" to put the local file on hdfs, if occur file exist error, run "make teardown" before "make setup"
 3) run "make" to start project 
+4) next can just run "make" to start project
 
 
 
